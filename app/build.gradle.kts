@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.android)
+
 }
 
 android {
@@ -30,17 +32,28 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
 
+    // Firebase and other dependencies
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database.ktx)
+
+    // Core libraries
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.firebase.auth)
+    implementation(libs.core.ktx)
+    implementation(libs.junit.ktx)
+
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
 }
