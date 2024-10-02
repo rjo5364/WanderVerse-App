@@ -7,23 +7,30 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class FirebaseTest {
 
     @Test
     fun connectToFirebase() {
-        // Initialize Firebase in the test context
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         FirebaseApp.initializeApp(appContext)
 
-        // Get reference to Firebase Database
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val reference: DatabaseReference = database.getReference("test_message")
+        val reference = database.getReference("Yx8fIx3Ckl00UmnhE6Vb")
 
-        // Write to the database
+        // Using CountDownLatch to wait for Firebase response
+        val latch = CountDownLatch(1)
+
         reference.setValue("Test Message").addOnCompleteListener { task ->
             assertTrue("Failed to connect to Firebase", task.isSuccessful)
+            latch.countDown() // Release the latch when task is complete
         }
+
+        // Wait for a maximum of 10 seconds for the task to complete
+        latch.await(10, TimeUnit.SECONDS)
     }
 }
