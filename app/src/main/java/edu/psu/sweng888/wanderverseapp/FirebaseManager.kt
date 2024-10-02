@@ -2,7 +2,7 @@ package edu.psu.sweng888.wanderverseapp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class FireBaseManager {
+class FirebaseManager {
     private var database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private var reference: DatabaseReference = database.getReference("messages")
 
