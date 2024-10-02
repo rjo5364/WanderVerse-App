@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import edu.psu.sweng888.wanderverseapp.FirebaseManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     TextView textView;
     FirebaseUser user;
-
+    private FirebaseManager firebaseManager;
 
 
     @Override
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Initialize Firebase
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        firebaseManager = new FirebaseManager();
 
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.buttonLogout);
