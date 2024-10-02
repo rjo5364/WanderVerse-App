@@ -20,13 +20,16 @@ output.json
 
 # IntelliJ IDEA
 *.iml
+.idea
 .idea/
+.idea/*
 .idea/caches
 .idea/libraries
 .idea/modules.xml
 .idea/workspace.xml
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
+.idea/deploymentTargetSelector.xml
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
