@@ -33,4 +33,16 @@ class FirebaseTest {
         // Wait for a maximum of 10 seconds for the task to complete
         latch.await(10, TimeUnit.SECONDS)
     }
+
+    @Test
+    fun readFromFirebase() {
+        val firebase = FirebaseManager()
+
+        firebase.readAllFields { data ->
+            println(data)
+            // You can also add assertions here to check if the data is what you expect
+            assertNotNull(data) // Example assertion
+        }
+    }
+
 }
