@@ -44,6 +44,7 @@ render.experimental.xml
 # Keystore files
 *.jks
 *.keystore
+wanderverse-fd812-firebase-adminsdk-heo00-06f00e3da7.json
 
 
 # Android Profiling
