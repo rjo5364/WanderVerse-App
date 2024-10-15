@@ -8,4 +8,12 @@
     <string name="click_to_login">Click to Login</string>
     <string name="click_to_register">Click to Register</string>
     <string name="logout">Logout</string>
+
+    <string-array name="activity_categories">
+        <item>Cycling</item>
+        <item>Running</item>
+        <item>Swimming</item>
+        <item>Walking</item>
+    </string-array>
+
 </resources>

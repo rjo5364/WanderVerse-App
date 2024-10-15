@@ -20,7 +20,7 @@ import edu.psu.sweng888.wanderverseapp.FirebaseManager;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button button;
+    Button button, buttonSelectActivity,buttonActivityLogging;
     TextView textView;
     FirebaseUser user;
     private FirebaseManager firebaseManager;
@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.buttonLogout);
         textView = findViewById(R.id.user_information);
         user = auth.getCurrentUser();
+        buttonSelectActivity = findViewById(R.id.button_select_activity);
+        buttonActivityLogging = findViewById(R.id.button_log_activity);
         if (user == null){
 
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -60,6 +62,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Handles activity selection button click
+        buttonSelectActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigate to the Activity Selection screen
+                Intent intent = new Intent(MainActivity.this, ActivitySelectionActivity.class);
+                startActivity(intent);
+            }
+        });
 
+        // Handles activity selection button click
+        buttonActivityLogging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigates to the Activity Selection screen
+                Intent intent = new Intent(MainActivity.this, LogActivity.class);
+                startActivity(intent);
+            }
+        });
         };
     }
