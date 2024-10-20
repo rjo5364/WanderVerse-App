@@ -40,8 +40,8 @@ class FirebaseTest {
 
         firebase.readAllFields { data ->
             println(data)
-            // You can also add assertions here to check if the data is what you expect
-            assertNotNull(data) // Example assertion
+
+            assertNotNull(data)
         }
     }
 
