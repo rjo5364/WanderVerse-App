@@ -23,6 +23,15 @@ class FirebaseManager {
         this.document = document
     }
 
+    // Read documents in a collection
+    fun readDocuments(onDocumentsReceived: (List<DocumentReference>) -> Unit) {
+        firestore.collection(this.collection).get().addOnSuccessListener { result ->
+            val documents = mutableListOf<DocumentReference>()
+            for (document in result) {
+                documents.add(document.reference)
+            }
+    }
+
     // Write a field to the document
     fun writeField(key: String, value: String, onComplete: (Boolean) -> Unit) {
         val data = hashMapOf(key to value)
