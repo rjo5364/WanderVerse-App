@@ -38,6 +38,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".RewardsList"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
     </application>

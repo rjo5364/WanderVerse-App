@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+
 
 
 
@@ -32,15 +34,23 @@ class RewardPaneAdapter (private val items: List<RewardPaneModel>) : RecyclerVie
     // Called by RecyclerView to display data at the specified position
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         // Get the current item from the list
-        val item = items[position]
+        val reward = items[position]
 
         // Bind data to views
-        holder.titleView.text = item.title
-        holder.descriptionView.text = item.description
-        holder.numberView.text = item.number.toString()
-        holder.imageView.setImageURI(item.imageUrl.toUri())
-        holder.iconView.setImageURI(item.iconUrl.toUri())
+        holder.titleView.text = reward.title
+        holder.descriptionView.text = reward.description
+        holder.numberView.text = reward.number.toString()
 
+
+        // Load icon URL using Glide
+        Glide.with(holder.iconView.context)
+            .load(reward.iconUrl)
+            .into(holder.iconView)
+
+        // Load reward image URL using Glide
+        Glide.with(holder.imageView.context)
+            .load(reward.imageUrl)
+            .into(holder.imageView)
     }
 
     // Returns the total number of items in the list

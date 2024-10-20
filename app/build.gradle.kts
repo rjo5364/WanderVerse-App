@@ -42,6 +42,11 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
 
+    // Image loading
+    implementation(libs.bumptech.glide)
+    annotationProcessor(libs.bumptech.glide.compiler)
+
+
     // Core libraries
     implementation(libs.appcompat)
     implementation(libs.material)

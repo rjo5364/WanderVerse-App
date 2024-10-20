@@ -15,8 +15,8 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/sample_image"
-            android:contentDescription="@string/item_image_desc"
+            android:src="@drawable/ic_launcher_foreground"
+            android:contentDescription="@drawable/ic_launcher_foreground"
             android:scaleType="centerCrop"
             android:layout_marginEnd="10dp"/>
 
@@ -60,8 +60,8 @@
                     android:id="@+id/item_icon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/sample_icon"
-                    android:contentDescription="@string/item_icon_desc"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:contentDescription="@drawable/ic_launcher_foreground"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="4dp"/>
 
