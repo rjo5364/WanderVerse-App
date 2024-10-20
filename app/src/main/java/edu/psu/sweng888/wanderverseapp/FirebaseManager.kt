@@ -30,6 +30,7 @@ class FirebaseManager {
             for (document in result) {
                 documents.add(document.reference)
             }
+            onDocumentsReceived(documents)
         }
     }
 
