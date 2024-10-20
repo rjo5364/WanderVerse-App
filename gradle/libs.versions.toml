@@ -1,5 +1,5 @@
 [versions]
-agp = "8.6.0"
+agp = "8.7.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -15,6 +15,7 @@ firebaseDatabaseKtx = "21.0.0"
 junitKtx = "1.2.1"
 monitor = "1.7.2"
 firebaseFirestoreKtx = "25.1.0"
+glide = "4.12.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -30,6 +31,8 @@ firebase-database-ktx = { group = "com.google.firebase", name = "firebase-databa
 junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+bumptech-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+bumptech-glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

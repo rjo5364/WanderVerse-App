@@ -20,7 +20,7 @@ import edu.psu.sweng888.wanderverseapp.FirebaseManager;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button button, buttonSelectActivity,buttonActivityLogging;
+    Button button, buttonSelectActivity, buttonActivityLogging, buttonViewRewards;
     TextView textView;
     FirebaseUser user;
     private FirebaseManager firebaseManager;
@@ -41,19 +41,19 @@ public class MainActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         buttonSelectActivity = findViewById(R.id.button_select_activity);
         buttonActivityLogging = findViewById(R.id.button_log_activity);
-        if (user == null){
+        buttonViewRewards = findViewById(R.id.button_view_rewards);
+        if (user == null) {
 
             Intent intent = new Intent(getApplicationContext(), Login.class);
             startActivity(intent);
             finish();
-        }
-        else{
+        } else {
             textView.setText(user.getEmail());
         }
 
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick (View view){
+            public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
 
                 Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -81,5 +81,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        };
+
+        // Handle view rewards button click
+        buttonViewRewards.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigate to the View Rewards screen
+                Intent intent = new Intent(MainActivity.this, RewardsList.class);
+                startActivity(intent);
+            }
+        });
     }
+}
