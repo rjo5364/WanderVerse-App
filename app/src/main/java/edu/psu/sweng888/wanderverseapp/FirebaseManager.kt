@@ -30,6 +30,7 @@ class FirebaseManager {
             for (document in result) {
                 documents.add(document.reference)
             }
+        }
     }
 
     // Write a field to the document
