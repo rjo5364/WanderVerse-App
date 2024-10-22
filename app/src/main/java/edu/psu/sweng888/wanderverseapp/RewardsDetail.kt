@@ -45,6 +45,7 @@ class RewardsDetail : AppCompatActivity() {
         pointsTextView.text = "Points: $rewardPoints"
         percentageTextView.text = "Completion: $rewardPercentage%"
 
+        Log.d("RewardsDetailActivity", "Reward Image URL: $rewardImageUrl")
         // Load the image using Glide
         Glide.with(this)
             .load(rewardImageUrl)
