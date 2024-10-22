@@ -41,6 +41,9 @@
             android:name=".RewardsList"
             android:exported="true" />
         <activity
+            android:name=".RewardsDetail"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
     </application>
