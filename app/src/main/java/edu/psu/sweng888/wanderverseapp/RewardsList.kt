@@ -1,5 +1,6 @@
 package edu.psu.sweng888.wanderverseapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -84,7 +85,17 @@ class RewardsList : AppCompatActivity() {
 
                     // Once all documents have been processed, update the adapter
                     if (processedDocuments == documents.size) {
-                        adapter = RewardPaneAdapter(rewards)
+                        adapter = RewardPaneAdapter(rewards) { reward ->
+                            // Start RewardsDetailActivity when an item is clicked
+                            val intent = Intent(this, RewardsDetail::class.java)
+                            intent.putExtra("rewardTitle", reward.title)
+                            intent.putExtra("rewardDescription", reward.description)
+                            intent.putExtra("rewardActivityType", reward.activityType)
+                            intent.putExtra("rewardImageUrl", reward.imageUrl)
+                            intent.putExtra("rewardPoints", reward.points)
+                            intent.putExtra("rewardPercentage", reward.percentage)
+                            startActivity(intent)
+                        }
                         recyclerView.adapter = adapter
                     }
                 }
