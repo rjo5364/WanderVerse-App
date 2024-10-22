@@ -15,15 +15,6 @@
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
         <activity
-            android:name=".LogActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RewardsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ActivitySelectionActivity"
-            android:exported="false" />
-        <activity
             android:name=".Register"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
