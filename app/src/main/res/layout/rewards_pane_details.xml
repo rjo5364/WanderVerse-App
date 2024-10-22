@@ -9,7 +9,9 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
+        android:maxWidth="200dp"
         android:layout_height="wrap_content"
+        android:maxHeight="200dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

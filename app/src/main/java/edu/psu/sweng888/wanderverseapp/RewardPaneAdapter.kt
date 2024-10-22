@@ -1,6 +1,7 @@
 package edu.psu.sweng888.wanderverseapp
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,9 +50,13 @@ class RewardPaneAdapter(
         }
         holder.iconView.setImageResource(iconViewId)
 
+        Log.d("Reward", "reward: $reward")
+        Log.d("ImageURLDebug", "Image URL: ${reward.imageUrl}")
         // Load reward image URL using Glide
         Glide.with(holder.imageView.context)
             .load(reward.imageUrl)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
             .into(holder.imageView)
 
         // Set the click listener to handle the item click
