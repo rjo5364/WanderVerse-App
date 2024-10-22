@@ -69,4 +69,12 @@ class FirebaseManager {
             onDataReceived(null)
         }
     }
+
+    // Create new document
+    fun createNewDocument(data: Map<String, Any>, onComplete: (Boolean) -> Unit) {
+        firestore.collection(this.collection).add(data).addOnCompleteListener { task ->
+            onComplete(task.isSuccessful)
+        }
+    }
+
 }

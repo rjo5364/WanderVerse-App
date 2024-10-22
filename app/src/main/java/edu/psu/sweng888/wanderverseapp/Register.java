@@ -3,6 +3,7 @@ package edu.psu.sweng888.wanderverseapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Register extends AppCompatActivity {
@@ -37,7 +39,9 @@ public class Register extends AppCompatActivity {
     Button buttonRegistration;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
+    //    To replace with FirebaseManager
     FirebaseFirestore fstore;
+    FirebaseManager fbm;
     String userID;
 
     @Override
@@ -60,6 +64,7 @@ public class Register extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         fstore = FirebaseFirestore.getInstance();
+        fbm = new FirebaseManager();
 
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
@@ -163,6 +168,9 @@ public class Register extends AppCompatActivity {
                                         Toast.makeText(Register.this, "Error! Profile Creation Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
 
+                                    // For Reward in Rewards, create a user_reward to track progress against
+                                    createUserRewards(userID);
+
 
                                     Intent intent = new Intent(getApplicationContext(), Login.class);
                                     startActivity(intent);
@@ -187,4 +195,42 @@ public class Register extends AppCompatActivity {
             }
         });
         };
+
+    public void createUserRewards(final String userId) {
+        // Set collection to rewards
+        fbm.setCollection("rewards");
+
+        // Call readDocuments method from Kotlin FirebaseManager
+        fbm.readDocuments(documentRefs -> {
+            // For each reward document, create a user_reward document
+            for (DocumentReference documentRef : documentRefs) {
+                String rewardId = documentRef.getId();  // Extract the reward's document ID
+
+                // Create the user_reward map
+                Map<String, Object> userReward = new HashMap<>();
+                userReward.put("userID", userId);
+                userReward.put("rewardID", rewardId);
+                userReward.put("progress", 0);  // Initial progress
+                userReward.put("completed", false);  // Initially set to incomplete
+                userReward.put("tracked", false);  // Initially not tracked
+
+                // Now set the collection to user_rewards
+                fbm.setCollection("user_rewards");
+
+                // Create a new document for each user_reward
+                fbm.createNewDocument(userReward, success -> {
+                    if (success) {
+                        Log.d("Firestore", "User reward document created successfully for rewardID: " + rewardId);
+                    } else {
+                        Log.e("Firestore", "Failed to create user reward document for rewardID: " + rewardId);
+                    }
+                    return null;
+                });
+            }
+            return null;  // Necessary because we're calling Kotlin code
+        });
     }
+
+
+
+}

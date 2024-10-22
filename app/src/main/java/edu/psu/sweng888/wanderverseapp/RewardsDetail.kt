@@ -3,11 +3,15 @@ package edu.psu.sweng888.wanderverseapp
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import com.bumptech.glide.Glide
 
 class RewardsDetail : AppCompatActivity() {
+
+    val fb: FirebaseManager = FirebaseManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,5 +49,36 @@ class RewardsDetail : AppCompatActivity() {
         Glide.with(this)
             .load(rewardImageUrl)
             .into(imageView)
+
+
+        // get the Switch
+        val rewardSwitch: SwitchCompat = findViewById(R.id.track_switch)
+
+        // Set the listener for the Switch
+        rewardSwitch.setOnCheckedChangeListener { _, isChecked ->
+            onSwitchToggled(isChecked)
+        }
+    }
+
+    // Handle the switch toggle event
+    private fun onSwitchToggled(isChecked: Boolean) {
+        if (isChecked) {
+            enableRewardFeature()
+        } else {
+            disableRewardFeature()
+        }
+    }
+
+    // Created a user_reward document
+    private fun enableRewardFeature() {
+        fb.setCollection("user_rewards")
+
+    }
+
+    // Deleted the user_reward document
+    private fun disableRewardFeature() {
+        // Implement what happens when the switch is OFF
+        Log.d("RewardsDetailActivity", "Reward feature disabled")
+        // Add any additional functionality you want here
     }
 }
