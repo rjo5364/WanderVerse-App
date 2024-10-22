@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
@@ -13,7 +12,7 @@ import com.bumptech.glide.Glide
 
 
 // Custom Adapter class
-class RewardPaneAdapter (private val items: List<RewardPaneModel>) : RecyclerView.Adapter<RewardPaneAdapter.ItemViewHolder>() {
+class RewardPaneAdapter (private val items: List<RewardModel>) : RecyclerView.Adapter<RewardPaneAdapter.ItemViewHolder>() {
 
     // ViewHolder class that holds references to each view in the item layout
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -39,13 +38,16 @@ class RewardPaneAdapter (private val items: List<RewardPaneModel>) : RecyclerVie
         // Bind data to views
         holder.titleView.text = reward.title
         holder.descriptionView.text = reward.description
-        holder.numberView.text = reward.number.toString()
+        holder.numberView.text = reward.denominator.toString()
 
 
-        // Load icon URL using Glide
-        Glide.with(holder.iconView.context)
-            .load(reward.iconUrl)
-            .into(holder.iconView)
+        // Choose the drawable resource dynamically based on the data class value
+        val iconViewId = when (reward.activityType) {
+            "bike" -> R.drawable.bike // Use the corresponding drawable resource
+            "run" -> R.drawable.run
+            else -> R.drawable.walk   // A default icon if no match is found
+        }
+        holder.iconView.setImageResource(iconViewId)
 
         // Load reward image URL using Glide
         Glide.with(holder.imageView.context)

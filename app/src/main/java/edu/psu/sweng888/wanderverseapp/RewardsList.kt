@@ -32,7 +32,7 @@ class RewardsList : AppCompatActivity() {
         fb.setCollection("rewards")
         fb.readDocuments { documents ->
             // Mutable list to store RewardPaneModel objects
-            val rewards = mutableListOf<RewardPaneModel>()
+            val rewards = mutableListOf<RewardModel>()
 
             // Variable to keep track of how many documents have been processed
             var processedDocuments = 0
@@ -46,13 +46,34 @@ class RewardsList : AppCompatActivity() {
                     // Check if the data exists
                     if (documentData != null) {
                         // Convert document data to RewardPaneModel
-                        val reward = RewardPaneModel(
+                        val reward = RewardModel(
                             imageUrl = documentData["url"] as? String ?: "",
                             title = documentData["Title"] as? String ?: "",
                             description = documentData["Description"] as? String ?: "",
-                            iconUrl = documentData["icon"] as? String ?: "",
-                            number = (documentData["Target"] as? Long)?.toInt() ?: 0
+                            activityType = documentData["ActivityCategory"] as? String ?: "",
+
+                            // Handling both Long and Double for "Target"
+                            denominator = when (val targetValue = documentData["Target"]) {
+                                is Long -> targetValue.toInt()
+                                is Double -> targetValue.toInt()
+                                else -> 0
+                            },
+
+                            // Handling both Long and Double for "Points"
+                            points = when (val pointsValue = documentData["Points"]) {
+                                is Long -> pointsValue.toInt()
+                                is Double -> pointsValue.toInt()
+                                else -> 0
+                            },
+
+                            // Handling both Long and Double for "Percentage"
+                            percentage = when (val percentageValue = documentData["Percentage"]) {
+                                is Long -> percentageValue.toFloat()
+                                is Double -> percentageValue.toFloat()
+                                else -> 0.00f
+                            }
                         )
+
 
                         // Add the reward to the list
                         rewards.add(reward)
