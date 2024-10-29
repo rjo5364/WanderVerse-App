@@ -1,10 +1,13 @@
 package edu.psu.sweng888.wanderverseapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.reflect.typeOf
 
 class RewardsList : AppCompatActivity() {
 
@@ -32,7 +35,7 @@ class RewardsList : AppCompatActivity() {
         fb.setCollection("rewards")
         fb.readDocuments { documents ->
             // Mutable list to store RewardPaneModel objects
-            val rewards = mutableListOf<RewardPaneModel>()
+            val rewards = mutableListOf<RewardModel>()
 
             // Variable to keep track of how many documents have been processed
             var processedDocuments = 0
@@ -45,13 +48,36 @@ class RewardsList : AppCompatActivity() {
                 fb.readAllFields { documentData ->
                     // Check if the data exists
                     if (documentData != null) {
+
                         // Convert document data to RewardPaneModel
-                        val reward = RewardPaneModel(
+                        val reward = RewardModel(
                             imageUrl = documentData["url"] as? String ?: "",
                             title = documentData["Title"] as? String ?: "",
                             description = documentData["Description"] as? String ?: "",
-                            iconUrl = documentData["icon"] as? String ?: "",
-                            number = (documentData["Target"] as? Long)?.toInt() ?: 0
+                            activityType = documentData["ActivityType"] as? String ?: "",
+                            // Handling both Int, Long, and String for Denominator
+                            denominator = when (val denomValue = documentData["Target"]) {
+                                is Int -> denomValue
+                                is Long -> denomValue.toInt()
+                                is String -> denomValue.toIntOrNull() ?: 0  // Convert String to Int safely
+                                else -> 0
+                            },
+
+                            // Handling both Int, Long, and String for Points
+                            points = when (val pointsValue = documentData["Points"]) {
+                                is Int -> pointsValue
+                                is Long -> pointsValue.toInt()
+                                is String -> pointsValue.toIntOrNull() ?: 0  // Convert String to Int safely
+                                else -> 0
+                            },
+
+                            // Handling percentage
+                            percentage = when (val percentageValue = documentData["Percentage"]) {
+                                is Double -> percentageValue.toFloat()
+                                is Long -> percentageValue.toFloat()
+                                is String -> percentageValue.toFloatOrNull() ?: 0.00f  // Handle String to Float
+                                else -> 0.00f
+                            }
                         )
 
                         // Add the reward to the list
@@ -63,7 +89,19 @@ class RewardsList : AppCompatActivity() {
 
                     // Once all documents have been processed, update the adapter
                     if (processedDocuments == documents.size) {
-                        adapter = RewardPaneAdapter(rewards)
+                        Log.d("RewardAdapter", "Rewards: $rewards")
+                        adapter = RewardPaneAdapter(rewards) { reward ->
+                            // Start RewardsDetailActivity when an item is clicked
+                            val intent = Intent(this, RewardsDetail::class.java)
+                            intent.putExtra("rewardTitle", reward.title)
+                            intent.putExtra("rewardDescription", reward.description)
+                            intent.putExtra("rewardActivityType", reward.activityType)
+                            intent.putExtra("rewardImageUrl", reward.imageUrl)
+                            intent.putExtra("rewardPoints", reward.points)
+                            intent.putExtra("rewardDenominator", reward.denominator)
+                            intent.putExtra("rewardPercentage", reward.percentage)
+                            startActivity(intent)
+                        }
                         recyclerView.adapter = adapter
                     }
                 }

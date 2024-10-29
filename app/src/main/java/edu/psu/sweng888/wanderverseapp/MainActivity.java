@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.buttonLogout);
         textView = findViewById(R.id.user_information);
         user = auth.getCurrentUser();
-        buttonSelectActivity = findViewById(R.id.button_select_activity);
-        buttonActivityLogging = findViewById(R.id.button_log_activity);
         buttonViewRewards = findViewById(R.id.button_view_rewards);
         if (user == null) {
 
@@ -62,25 +60,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Handles activity selection button click
-        buttonSelectActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Navigate to the Activity Selection screen
-                Intent intent = new Intent(MainActivity.this, ActivitySelectionActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Handles activity selection button click
-        buttonActivityLogging.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Navigates to the Activity Selection screen
-                Intent intent = new Intent(MainActivity.this, LogActivity.class);
-                startActivity(intent);
-            }
-        });
 
         // Handle view rewards button click
         buttonViewRewards.setOnClickListener(new View.OnClickListener() {

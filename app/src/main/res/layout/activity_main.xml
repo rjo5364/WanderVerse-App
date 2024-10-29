@@ -21,24 +21,17 @@
     />
 
     <Button
-        android:id="@+id/button_select_activity"
+        android:id="@+id/view_map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enroll in Rewards"
-        android:layout_marginTop="20dp" />
-
-    <Button
-        android:id="@+id/button_log_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Log an Activity"
+        android:text="Map"
         android:layout_marginTop="20dp" />
 
     <Button
         android:id="@+id/button_view_rewards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View Rewards"
+        android:text="Rewards"
         android:layout_marginTop="20dp" />
 
     <Button
