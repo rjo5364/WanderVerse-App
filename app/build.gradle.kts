@@ -38,6 +38,10 @@ android {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation ("com.google.android.gms:play-services-maps:18.0.0")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.android.libraries.places:places:3.1.0")
+
     // Firebase and other dependencies
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
