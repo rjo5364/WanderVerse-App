@@ -10,4 +10,8 @@
     <color name="coral_red">#EF476F</color>
     <color name="light_gray">#F1F1F1</color>
     <color name="dark_gray">#4A4A4A</color>
+    <color name="green_border">#4CAF50</color>
+    <color name="yellow_border">#FFEB3B</color>
+    <color name="default_border">#FFFFFF</color>
+
 </resources>

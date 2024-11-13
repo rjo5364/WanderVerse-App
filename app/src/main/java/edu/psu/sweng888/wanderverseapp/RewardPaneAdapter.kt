@@ -1,23 +1,25 @@
 package edu.psu.sweng888.wanderverseapp
 
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 // Custom Adapter class
 class RewardPaneAdapter(
-    private val items: List<RewardModel>,  // List of rewards
-    private val onItemClick: (RewardModel) -> Unit  // Lambda function for item clicks
+    private var items: MutableList<RewardModel>,  // Mutable list of rewards
+    private val userRewardMap: Map<String, UserRewardModel>, // Pass userRewardMap for states
+    private val onItemClick: (RewardModel) -> Unit,  // Lambda function for item clicks
 ) : RecyclerView.Adapter<RewardPaneAdapter.ItemViewHolder>() {
 
     // ViewHolder class that holds references to each view in the item layout
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val cardView: CardView = itemView.findViewById(R.id.cardView)
         val imageView: ImageView = itemView.findViewById(R.id.item_image)
         val titleView: TextView = itemView.findViewById(R.id.item_title)
         val descriptionView: TextView = itemView.findViewById(R.id.item_description)
@@ -41,6 +43,19 @@ class RewardPaneAdapter(
         holder.titleView.text = reward.title
         holder.descriptionView.text = reward.description
         holder.numberView.text = reward.denominator.toString()
+
+        // Set border color based on userRewardMap
+        val userReward = userRewardMap[reward.id]
+        val borderColor = when {
+            userReward?.completed == true -> R.color.green_border
+            userReward?.tracked == true -> R.color.yellow_border
+            else -> R.color.default_border
+        }
+
+        // Apply the border color dynamically
+        holder.cardView.setCardBackgroundColor(
+            holder.cardView.context.resources.getColor(borderColor, null)
+        )
 
         // Choose the drawable resource dynamically based on the data class value
         val iconViewId = when (reward.activityType) {
@@ -68,5 +83,12 @@ class RewardPaneAdapter(
     // Returns the total number of items in the list
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    // Add this method to dynamically update the list
+    fun updateList(newItems: List<RewardModel>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 }

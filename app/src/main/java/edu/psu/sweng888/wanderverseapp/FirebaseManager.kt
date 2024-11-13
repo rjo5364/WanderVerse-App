@@ -1,5 +1,6 @@
 package edu.psu.sweng888.wanderverseapp
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -40,6 +41,18 @@ class FirebaseManager {
         getReference().set(data).addOnCompleteListener { task ->
             onComplete(task.isSuccessful)
         }
+    }
+
+    fun updateField(key: String, value: Any, onComplete: (Boolean) -> Unit) {
+        getReference().update(key, value)
+            .addOnSuccessListener {
+                Log.d("FirebaseManager", "Field $key successfully updated to $value")
+                onComplete(true) // Notify success
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirebaseManager", "Failed to update field $key to $value", e)
+                onComplete(false) // Notify failure
+            }
     }
 
     // Read one value from the document based on the key

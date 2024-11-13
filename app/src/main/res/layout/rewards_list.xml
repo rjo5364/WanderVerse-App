@@ -9,6 +9,13 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Dropdown for Filtering -->
+        <Spinner
+            android:id="@+id/filterSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
+
         <!-- RecyclerView that holds all the items -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

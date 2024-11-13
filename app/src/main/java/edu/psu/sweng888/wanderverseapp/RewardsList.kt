@@ -3,6 +3,10 @@ package edu.psu.sweng888.wanderverseapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,92 +25,180 @@ class RewardsList : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Add a vertical divider between items
         val dividerItemDecoration = DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL)
         recyclerView.addItemDecoration(dividerItemDecoration)
 
-        // Fetch data and bind the adapter
-        fetchItems()
+        // Initialize the spinner
+        Log.d("RewardsList", "Spinner Initialized.")
+        val filterSpinner: Spinner = findViewById(R.id.filterSpinner)
+        val filterOptions = listOf("Remaining","Run", "Walk", "Bike", "Tracked", "Completed")
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filterOptions)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        filterSpinner.adapter = spinnerAdapter
+
+        // Fetch user rewards first, then fetch main rewards
+        fetchUserRewards {
+            Log.d("RewardsList", "User rewards fetched.")
+            fetchItems { rewards ->
+                adapter = RewardPaneAdapter(rewards.toMutableList(), userRewardMap) { reward ->
+                    val intent = Intent(this, RewardsDetail::class.java)
+                    intent.putExtra("rewardTitle", reward.title)
+                    intent.putExtra("rewardDescription", reward.description)
+                    intent.putExtra("rewardActivityType", reward.activityType)
+                    intent.putExtra("rewardImageUrl", reward.imageUrl)
+                    intent.putExtra("rewardPoints", reward.points)
+                    intent.putExtra("rewardDenominator", reward.denominator)
+                    intent.putExtra("rewardPercentage", reward.percentage)
+                    // Helpful incase userReward fails to load
+                    val userRewardID = userRewardMap[reward.id]?.id // Get userRewardID from the map
+                    if (userRewardID != null) {
+                        intent.putExtra("userRewardID", userRewardID)
+                        Log.d("RewardNavigation", "Passing userRewardID: $userRewardID")
+                    } else {
+                        Log.e("RewardNavigation", "No userRewardID found for reward ID: ${reward.id}")
+                    }
+                    startActivity(intent)
+                }
+                recyclerView.adapter = adapter
+
+                // Set up filtering logic
+                filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        val selectedFilter = filterOptions[position]
+                        val filteredRewards = when (selectedFilter) {
+                            "Remaining" -> rewards.filter { reward ->
+                                userRewardMap[reward.id]?.completed == false
+                            }
+                            "Tracked" -> rewards.filter { reward ->
+                                userRewardMap[reward.id]?.tracked == true
+                            }
+                            "Completed" -> rewards.filter { reward ->
+                                userRewardMap[reward.id]?.completed == true
+                            }
+                            "Run" -> rewards.filter { reward ->
+                                reward.activityType == "run"
+                            }
+                            "Walk" -> rewards.filter { reward ->
+                                reward.activityType == "walk"
+                            }
+                            "Bike" -> rewards.filter { reward ->
+                                reward.activityType == "bike"
+                            }
+                            else -> rewards.filter { reward -> reward.activityType == selectedFilter }
+                        }
+                        Log.d("RewardsList", "Filtered rewards for '$selectedFilter': $filteredRewards")
+                        adapter.updateList(filteredRewards)
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            }
+        }
     }
 
-    private fun fetchItems() {
+
+    private fun fetchItems(callback: (List<RewardModel>) -> Unit) {
         val fb = FirebaseManager()
 
         fb.setCollection("rewards")
         fb.readDocuments { documents ->
-            // Mutable list to store RewardPaneModel objects
-            val rewards = mutableListOf<RewardModel>()
+            if (documents.isEmpty()) {
+                Log.e("fetchItems", "No documents found in rewards collection.")
+            } else {
+                Log.d("fetchItems", "Documents fetched: ${documents.size}")
+            }
 
-            // Variable to keep track of how many documents have been processed
+            val rewards = mutableListOf<RewardModel>()
             var processedDocuments = 0
 
-            // Loop through document references
             documents.forEach { documentRef ->
-                fb.setDocument(documentRef.id)  // Set the document reference
+                fb.setDocument(documentRef.id)
 
-                // Fetch the document's fields
                 fb.readAllFields { documentData ->
-                    // Check if the data exists
                     if (documentData != null) {
-
-                        // Convert document data to RewardPaneModel
+                        Log.d("fetchItems", "Document ID: ${documentRef.id}, Data: $documentData")
                         val reward = RewardModel(
+                            id = documentRef.id,
                             imageUrl = documentData["url"] as? String ?: "",
                             title = documentData["Title"] as? String ?: "",
                             description = documentData["Description"] as? String ?: "",
                             activityType = documentData["ActivityType"] as? String ?: "",
-                            // Handling both Int, Long, and String for Denominator
                             denominator = when (val denomValue = documentData["Target"]) {
                                 is Int -> denomValue
                                 is Long -> denomValue.toInt()
-                                is String -> denomValue.toIntOrNull() ?: 0  // Convert String to Int safely
+                                is String -> denomValue.toIntOrNull() ?: 0
                                 else -> 0
                             },
-
-                            // Handling both Int, Long, and String for Points
                             points = when (val pointsValue = documentData["Points"]) {
                                 is Int -> pointsValue
                                 is Long -> pointsValue.toInt()
-                                is String -> pointsValue.toIntOrNull() ?: 0  // Convert String to Int safely
+                                is String -> pointsValue.toIntOrNull() ?: 0
                                 else -> 0
                             },
-
-                            // Handling percentage
                             percentage = when (val percentageValue = documentData["Percentage"]) {
                                 is Double -> percentageValue.toFloat()
                                 is Long -> percentageValue.toFloat()
-                                is String -> percentageValue.toFloatOrNull() ?: 0.00f  // Handle String to Float
+                                is String -> percentageValue.toFloatOrNull() ?: 0.00f
                                 else -> 0.00f
                             }
                         )
-
-                        // Add the reward to the list
                         rewards.add(reward)
+                    } else {
+                        Log.e("fetchItems", "Document data is null for ID: ${documentRef.id}")
                     }
 
-                    // Increment the counter for processed documents
                     processedDocuments++
 
-                    // Once all documents have been processed, update the adapter
                     if (processedDocuments == documents.size) {
-                        Log.d("RewardAdapter", "Rewards: $rewards")
-                        adapter = RewardPaneAdapter(rewards) { reward ->
-                            // Start RewardsDetailActivity when an item is clicked
-                            val intent = Intent(this, RewardsDetail::class.java)
-                            intent.putExtra("rewardTitle", reward.title)
-                            intent.putExtra("rewardDescription", reward.description)
-                            intent.putExtra("rewardActivityType", reward.activityType)
-                            intent.putExtra("rewardImageUrl", reward.imageUrl)
-                            intent.putExtra("rewardPoints", reward.points)
-                            intent.putExtra("rewardDenominator", reward.denominator)
-                            intent.putExtra("rewardPercentage", reward.percentage)
-                            startActivity(intent)
-                        }
-                        recyclerView.adapter = adapter
+                        callback(rewards)
                     }
                 }
             }
         }
     }
+
+
+
+    private lateinit var userRewardMap: Map<String, UserRewardModel>
+
+    private fun fetchUserRewards(callback: () -> Unit) {
+        val fb = FirebaseManager()
+        var processedDocuments = 0
+
+        Log.d("fetchUserRewards", "Fetching user rewards...")
+
+        fb.setCollection("user_rewards") // Secondary collection for UserRewardModel
+        fb.readDocuments { documents ->
+            val userRewardTempMap = mutableMapOf<String, UserRewardModel>()
+
+            documents.forEach { documentRef ->
+                fb.setDocument(documentRef.id)
+                fb.readAllFields { documentData ->
+                    if (documentData != null) {
+                        val userReward = UserRewardModel(
+                            completed = documentData["completed"] as? Boolean ?: false,
+                            progress = documentData["progress"] as? Int ?: 0,
+                            rewardID = documentData["rewardID"] as? String ?: "",
+                            tracked = documentData["tracked"] as? Boolean ?: false,
+                            userID = documentData["userID"] as? String ?: "",
+                            id = documentRef.id
+                        )
+                        Log.d("fetchUserRewards", "User reward fetched: $userReward")
+                        userRewardTempMap[userReward.rewardID] = userReward
+                    }
+                    processedDocuments++
+
+                    // Invoke callback once all documents are processed
+                    if (processedDocuments == documents.size) {
+                        userRewardMap = userRewardTempMap
+                        Log.d("fetchUserRewards", "All user rewards processed. Invoking callback.")
+                        callback()
+                    }
+                }
+            }
+        }
+    }
+
+
 
 }
