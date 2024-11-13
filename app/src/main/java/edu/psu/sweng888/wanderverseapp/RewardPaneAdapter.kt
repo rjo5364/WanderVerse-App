@@ -1,6 +1,5 @@
 package edu.psu.sweng888.wanderverseapp
 
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,7 @@ import com.bumptech.glide.Glide
 
 // Custom Adapter class
 class RewardPaneAdapter(
-    private val items: List<RewardModel>,  // List of rewards
+    private var items: MutableList<RewardModel>,  // Mutable list of rewards
     private val onItemClick: (RewardModel) -> Unit  // Lambda function for item clicks
 ) : RecyclerView.Adapter<RewardPaneAdapter.ItemViewHolder>() {
 
@@ -68,5 +67,12 @@ class RewardPaneAdapter(
     // Returns the total number of items in the list
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    // Add this method to dynamically update the list
+    fun updateList(newItems: List<RewardModel>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 }
