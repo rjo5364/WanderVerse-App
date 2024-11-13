@@ -13,6 +13,7 @@ data class RewardModel(
 
 
 data class UserRewardModel(
+    val id: String,
     val completed: Boolean,
     val progress: Int,
     val rewardID: String,

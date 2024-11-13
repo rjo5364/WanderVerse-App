@@ -49,6 +49,14 @@ class RewardsList : AppCompatActivity() {
                     intent.putExtra("rewardPoints", reward.points)
                     intent.putExtra("rewardDenominator", reward.denominator)
                     intent.putExtra("rewardPercentage", reward.percentage)
+                    // Helpful incase userReward fails to load
+                    val userRewardID = userRewardMap[reward.id]?.id // Get userRewardID from the map
+                    if (userRewardID != null) {
+                        intent.putExtra("userRewardID", userRewardID)
+                        Log.d("RewardNavigation", "Passing userRewardID: $userRewardID")
+                    } else {
+                        Log.e("RewardNavigation", "No userRewardID found for reward ID: ${reward.id}")
+                    }
                     startActivity(intent)
                 }
                 recyclerView.adapter = adapter
@@ -170,7 +178,8 @@ class RewardsList : AppCompatActivity() {
                             progress = documentData["progress"] as? Int ?: 0,
                             rewardID = documentData["rewardID"] as? String ?: "",
                             tracked = documentData["tracked"] as? Boolean ?: false,
-                            userID = documentData["userID"] as? String ?: ""
+                            userID = documentData["userID"] as? String ?: "",
+                            id = documentRef.id
                         )
                         Log.d("fetchUserRewards", "User reward fetched: $userReward")
                         userRewardTempMap[userReward.rewardID] = userReward
