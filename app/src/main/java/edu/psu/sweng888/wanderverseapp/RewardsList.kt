@@ -65,8 +65,18 @@ class RewardsList : AppCompatActivity() {
                             "Completed" -> rewards.filter { reward ->
                                 userRewardMap[reward.id]?.completed == true
                             }
+                            "Run" -> rewards.filter { reward ->
+                                reward.activityType == "run"
+                            }
+                            "Walk" -> rewards.filter { reward ->
+                                reward.activityType == "walk"
+                            }
+                            "Bike" -> rewards.filter { reward ->
+                                reward.activityType == "bike"
+                            }
                             else -> rewards.filter { reward -> reward.activityType == selectedFilter }
                         }
+                        Log.d("RewardsList", "Filtered rewards for '$selectedFilter': $filteredRewards")
                         adapter.updateList(filteredRewards)
                     }
 
