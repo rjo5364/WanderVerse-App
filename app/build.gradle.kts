@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
@@ -19,9 +21,18 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        // Read MAPS_API_KEY from local.properties
-        val mapsApiKey: String? = project.findProperty("MAPS_API_KEY") as String?
+
+        val localProperties = Properties()
+        file(rootProject.file("local.properties")).inputStream().use {
+            localProperties.load(it)
+        }
+
+        val mapsApiKey: String? = localProperties.getProperty("MAPS_API_KEY")
+        val placesApiKey: String? = localProperties.getProperty("PLACES_API_KEY")
+
         buildConfigField("String", "MAPS_API_KEY", "\"${mapsApiKey ?: ""}\"")
+        buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey ?: ""}\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
