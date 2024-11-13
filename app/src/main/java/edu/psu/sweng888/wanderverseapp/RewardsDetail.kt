@@ -1,5 +1,6 @@
 package edu.psu.sweng888.wanderverseapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -72,6 +73,7 @@ class RewardsDetail : AppCompatActivity() {
 
     // Handle the switch toggle event
     private fun onSwitchToggled(isChecked: Boolean, documentId: String) {
+
         if (isChecked) {
             enableRewardFeature(documentId)
         } else {
@@ -124,5 +126,6 @@ class RewardsDetail : AppCompatActivity() {
             }
         }
     }
+
 
 }

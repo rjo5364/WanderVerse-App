@@ -40,7 +40,7 @@ class RewardsList : AppCompatActivity() {
         fetchUserRewards {
             Log.d("RewardsList", "User rewards fetched.")
             fetchItems { rewards ->
-                adapter = RewardPaneAdapter(rewards.toMutableList()) { reward ->
+                adapter = RewardPaneAdapter(rewards.toMutableList(), userRewardMap) { reward ->
                     val intent = Intent(this, RewardsDetail::class.java)
                     intent.putExtra("rewardTitle", reward.title)
                     intent.putExtra("rewardDescription", reward.description)
@@ -196,5 +196,7 @@ class RewardsList : AppCompatActivity() {
             }
         }
     }
+
+
 
 }
