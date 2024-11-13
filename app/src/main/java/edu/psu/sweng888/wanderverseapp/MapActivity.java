@@ -50,7 +50,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         setContentView(R.layout.activity_map);
 
         // Initialize Places API
-        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+        Places.initialize(getApplicationContext(), getString(R.string.google_api_key));
         placesClient = Places.createClient(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 

@@ -31,7 +31,7 @@ class RewardsList : AppCompatActivity() {
         // Initialize the spinner
         Log.d("RewardsList", "Spinner Initialized.")
         val filterSpinner: Spinner = findViewById(R.id.filterSpinner)
-        val filterOptions = listOf("Remaining","Run", "Walk", "Bike", "Tracked", "Completed")
+        val filterOptions = listOf("All","Run", "Walk", "Bike", "Tracked", "Completed")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filterOptions)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         filterSpinner.adapter = spinnerAdapter
@@ -66,7 +66,7 @@ class RewardsList : AppCompatActivity() {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         val selectedFilter = filterOptions[position]
                         val filteredRewards = when (selectedFilter) {
-                            "Remaining" -> rewards.filter { reward ->
+                            "All" -> rewards.filter { reward ->
                                 userRewardMap[reward.id]?.completed == false
                             }
                             "Tracked" -> rewards.filter { reward ->

@@ -8,13 +8,20 @@ android {
     namespace = "edu.psu.sweng888.wanderverseapp"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true // Enable BuildConfig generation
+    }
+
+
     defaultConfig {
         applicationId = "edu.psu.sweng888.wanderverseapp"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        // Read MAPS_API_KEY from local.properties
+        val mapsApiKey: String? = project.findProperty("MAPS_API_KEY") as String?
+        buildConfigField("String", "MAPS_API_KEY", "\"${mapsApiKey ?: ""}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -48,6 +55,7 @@ dependencies {
 
     // Image loading
     implementation(libs.bumptech.glide)
+    implementation(libs.play.services.maps)
     annotationProcessor(libs.bumptech.glide.compiler)
 
 
