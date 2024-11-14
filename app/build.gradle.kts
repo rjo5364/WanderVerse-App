@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
@@ -8,12 +10,27 @@ android {
     namespace = "edu.psu.sweng888.wanderverseapp"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true // Enable BuildConfig generation
+    }
+
+
     defaultConfig {
         applicationId = "edu.psu.sweng888.wanderverseapp"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        val localProperties = Properties()
+        file(rootProject.file("local.properties")).inputStream().use {
+            localProperties.load(it)
+        }
+
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY")
+        val placesApiKey: String? = localProperties.getProperty("PLACES_API_KEY")
+
+        buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey ?: ""}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,6 +65,7 @@ dependencies {
 
     // Image loading
     implementation(libs.bumptech.glide)
+    implementation(libs.play.services.maps)
     annotationProcessor(libs.bumptech.glide.compiler)
 
 

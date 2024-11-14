@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -49,8 +50,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        Log.d("API_KEY_DEBUG", "PLACES_API_KEY: " + BuildConfig.PLACES_API_KEY);
         // Initialize Places API
-        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+        Places.initialize(getApplicationContext(), BuildConfig.PLACES_API_KEY);
         placesClient = Places.createClient(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -137,7 +139,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         recyclerViewSuggestions.setAdapter(suggestionAdapter);
                         suggestionAdapter.notifyDataSetChanged();
                     }).addOnFailureListener(e -> {
-                        Toast.makeText(MapActivity.this, "Failed to retrieve places: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this, "Failed to retrieve places: ", Toast.LENGTH_SHORT).show();
+                        Log.e("MapActivity", "Failed to retrieve places", e);
                     });
                 }
             });
