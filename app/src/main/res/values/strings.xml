@@ -8,6 +8,7 @@
     <string name="click_to_login">Click to Login</string>
     <string name="click_to_register">Click to Register</string>
     <string name="logout">Logout</string>
+    <string name="google_maps_key" />
 
     <string-array name="activity_categories">
         <item>Cycling</item>

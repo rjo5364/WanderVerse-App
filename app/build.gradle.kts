@@ -27,10 +27,9 @@ android {
             localProperties.load(it)
         }
 
-        val mapsApiKey: String? = localProperties.getProperty("MAPS_API_KEY")
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY")
         val placesApiKey: String? = localProperties.getProperty("PLACES_API_KEY")
 
-        buildConfigField("String", "MAPS_API_KEY", "\"${mapsApiKey ?: ""}\"")
         buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey ?: ""}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
