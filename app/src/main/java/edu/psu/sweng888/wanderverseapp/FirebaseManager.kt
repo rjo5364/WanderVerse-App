@@ -2,6 +2,7 @@ package edu.psu.sweng888.wanderverseapp
 
 import android.util.Log
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirebaseManager {
@@ -89,5 +90,47 @@ class FirebaseManager {
             onComplete(task.isSuccessful)
         }
     }
+
+//    This function is used to update the distance traveled in the database for a particular user.
+fun updateProgress(userId: String, rewardId: String, distance: Double, isIncrement: Boolean = true) {
+    // Query the collection to find the document with the matching userId and rewardId
+    firestore.collection(collection)
+        .whereEqualTo("userId", userId)
+        .whereEqualTo("rewardId", rewardId)
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            if (querySnapshot != null && !querySnapshot.isEmpty) {
+                // Get the reference of the matching document
+                val documentRef = querySnapshot.documents[0].reference
+
+                if (isIncrement) {
+                    // Increment the progress field
+                    documentRef.update("progress", FieldValue.increment(distance))
+                        .addOnSuccessListener {
+                            Log.d("FirebaseUpdate", "Progress for user $userId and reward $rewardId incremented by $distance successfully.")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FirebaseUpdate", "Error incrementing progress: $e")
+                        }
+                } else {
+                    // Overwrite the progress field
+                    documentRef.update("progress", distance)
+                        .addOnSuccessListener {
+                            Log.d("FirebaseUpdate", "Progress for user $userId and reward $rewardId set to $distance successfully.")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FirebaseUpdate", "Error setting progress: $e")
+                        }
+                }
+            } else {
+                Log.e("FirebaseUpdate", "No matching document found for user $userId and reward $rewardId")
+            }
+        }
+        .addOnFailureListener { e ->
+            Log.e("FirebaseUpdate", "Error querying Firestore: $e")
+        }
+}
+
+
 
 }
