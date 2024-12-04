@@ -1,5 +1,6 @@
 package edu.psu.sweng888.wanderverseapp
 
+import android.location.Location
 import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -130,6 +131,20 @@ fun updateProgress(userId: String, rewardId: String, distance: Double, isIncreme
             Log.e("FirebaseUpdate", "Error querying Firestore: $e")
         }
 }
+
+    fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val startLocation = Location("start").apply {
+            latitude = lat1
+            longitude = lon1
+        }
+
+        val endLocation = Location("end").apply {
+            latitude = lat2
+            longitude = lon2
+        }
+
+        return startLocation.distanceTo(endLocation) // Distance in meters
+    }
 
 
 
