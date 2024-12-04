@@ -24,6 +24,7 @@ class RewardsDetail : AppCompatActivity() {
         val rewardPoints = intent.getIntExtra("rewardPoints", 0)
         val rewardPercentage = intent.getFloatExtra("rewardPercentage", 0f)
         val userRewardID = intent.getStringExtra("userRewardID")
+        val rewardPercentageString = String.format("%.2f", rewardPercentage)
 
         if (userRewardID != null) {
             setInitialSwitchState(userRewardID)
@@ -51,7 +52,7 @@ class RewardsDetail : AppCompatActivity() {
         titleTextView.text = rewardTitle
         descriptionTextView.text = rewardDescription
         pointsTextView.text = "Points: $rewardPoints"
-        percentageTextView.text = "Completion: $rewardPercentage%"
+        percentageTextView.text = "Completion: $rewardPercentageString%"
 
         Log.d("RewardsDetailActivity", "Reward Image URL: $rewardImageUrl")
         // Load the image using Glide
