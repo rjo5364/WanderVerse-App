@@ -1,236 +1,221 @@
 package edu.psu.sweng888.wanderverseapp;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Register extends AppCompatActivity {
 
-    TextInputEditText editTextEmail, editTextPassword, editTextFirstName, editTextLastName, editTextAge, editTextPreference;
-    TextView textView;
+    // Declare UI elements and Firebase variables
+    TextInputEditText editTextEmail, editTextPassword, editTextFirstName, editTextLastName;
+    Spinner spinnerAge, spinnerActivityCategory, spinnerPointOfInterest;
     Button buttonRegistration;
-    FirebaseAuth mAuth;
+    TextView textView;
     ProgressBar progressBar;
-    //    To replace with FirebaseManager
-    FirebaseFirestore fstore;
-    FirebaseManager fbm;
-    String userID;
+    FirebaseAuth mAuth; // This handles Firebase Authentication
+    FirebaseFirestore fstore; // This handles Firestore database operations
+    String userID; // This stores the current user's ID
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Checks if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-    }
+    // Map to associate friendly names with Google Places API terms
+    private final Map<String, String> poiMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
+        // Initialize Firebase Auth and Firestore instances
         mAuth = FirebaseAuth.getInstance();
         fstore = FirebaseFirestore.getInstance();
-        fbm = new FirebaseManager();
 
+        // Find views by their IDs
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         editTextFirstName = findViewById(R.id.f_name);
         editTextLastName = findViewById(R.id.l_name);
-        editTextAge = findViewById(R.id.age);
-        editTextPreference = findViewById(R.id.t_pref);
+        spinnerAge = findViewById(R.id.spinner_age);
+        spinnerActivityCategory = findViewById(R.id.spinner_activity_category);
+        spinnerPointOfInterest = findViewById(R.id.spinner_point_of_interest);
         buttonRegistration = findViewById(R.id.button_register);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.loginNow);
 
-        textView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent = new Intent(getApplicationContext(), Login.class);
-                startActivity(intent);
-                finish();
-            }
+        // Initialize the friendly names map
+        initializePoiMap();
+
+        // Set up spinners with data from string arrays or map keys
+        ArrayAdapter<CharSequence> ageAdapter = ArrayAdapter.createFromResource(this, R.array.age_range, android.R.layout.simple_spinner_item);
+        ageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAge.setAdapter(ageAdapter);
+
+        ArrayAdapter<CharSequence> activityAdapter = ArrayAdapter.createFromResource(this, R.array.activity_categories, android.R.layout.simple_spinner_item);
+        activityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerActivityCategory.setAdapter(activityAdapter);
+
+        // Populate the spinner with friendly names
+        ArrayAdapter<String> poiAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, poiMap.keySet().toArray(new String[0]));
+        poiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPointOfInterest.setAdapter(poiAdapter);
+
+        // Set up a click listener for the "Login Now" text view
+        textView.setOnClickListener(view -> {
+            // This starts the Login activity and finishes the current activity
+            Intent intent = new Intent(getApplicationContext(), Login.class);
+            startActivity(intent);
+            finish();
         });
 
-        buttonRegistration.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
+        // Set up a click listener for the registration button
+        buttonRegistration.setOnClickListener(view -> {
+            // Show progress bar during registration
+            progressBar.setVisibility(View.VISIBLE);
 
-                progressBar.setVisibility(View.VISIBLE);
-                String email, password, fName, lName, age, preference;
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
-                fName = String.valueOf(editTextFirstName.getText());
-                lName = String.valueOf(editTextLastName.getText());
-                age = String.valueOf(editTextAge.getText());
-                preference = String.valueOf(editTextPreference.getText());
+            // Get input values from the form
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
+            String fName = editTextFirstName.getText().toString();
+            String lName = editTextLastName.getText().toString();
+            String age = spinnerAge.getSelectedItem().toString();
+            String activityCategory = spinnerActivityCategory.getSelectedItem().toString();
+            String displayPointOfInterest = spinnerPointOfInterest.getSelectedItem().toString();
 
-                // null checks etc
-                if (TextUtils.isEmpty(fName)) {
-                    Toast.makeText(Register.this, "Enter your first name", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
+            // Map the friendly display name to the API term
+            String pointOfInterest = poiMap.get(displayPointOfInterest);
 
-                if (TextUtils.isEmpty(lName)) {
-                    Toast.makeText(Register.this, "Enter your last name", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Register.this, "Enter a non-empty email", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Register.this, "Enter a non-empty password", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                if (password.length() < 6) {
-                    Toast.makeText(Register.this, "Your password must be 6 characters or longer", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                if (TextUtils.isEmpty(age)) {
-                    Toast.makeText(Register.this, "Enter your age", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                if (TextUtils.isEmpty(preference)) {
-                    Toast.makeText(Register.this, "Enter your activity preference", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(Register.this, "Registration Completed Succesfully",
-                                            Toast.LENGTH_SHORT).show();
-
-                                    // Retrieves user ID and store additional user details in Firestore
-                                    userID = mAuth.getCurrentUser().getUid();
-                                    DocumentReference documentReference = fstore.collection("users").document(userID);
-
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("fName", fName);
-                                    user.put("lName", lName);
-                                    user.put("email", email);
-                                    user.put("age", age);
-                                    user.put("preference", preference);
-
-                                    // Stores user details in Firestore
-                                    documentReference.set(user).addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(Register.this, "User Profile Created", Toast.LENGTH_SHORT).show();
-                                    }).addOnFailureListener(e -> {
-                                        Toast.makeText(Register.this, "Error! Profile Creation Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
-
-                                    // For Reward in Rewards, create a user_reward to track progress against
-                                    createUserRewards(userID);
-
-
-                                    Intent intent = new Intent(getApplicationContext(), Login.class);
-                                    startActivity(intent);
-                                    finish();
-
-                                }
-                                else {
-                                    // If sign-in fails, displays a message to the user.
-                                    try {
-                                        throw task.getException();
-                                    } catch (FirebaseAuthUserCollisionException e) {
-                                        // Email already in use
-                                        Toast.makeText(Register.this, "Unable To Create Account: This email is already registered.", Toast.LENGTH_LONG).show();
-                                    } catch (Exception e) {
-                                        // Handle other error/excp
-                                        Toast.makeText(Register.this, "Authentication failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            }
-                        });
-
+            // Validate inputs
+            if (TextUtils.isEmpty(fName) || TextUtils.isEmpty(lName) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(pointOfInterest)) {
+                Toast.makeText(Register.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                return;
             }
-        });
-        };
 
-    public void createUserRewards(final String userId) {
-        // Set collection to rewards
-        fbm.setCollection("rewards");
+            if (password.length() < 6) {
+                Toast.makeText(Register.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                return;
+            }
 
-        // Call readDocuments method from Kotlin FirebaseManager
-        fbm.readDocuments(documentRefs -> {
-            // For each reward document, create a user_reward document
-            for (DocumentReference documentRef : documentRefs) {
-                String rewardId = documentRef.getId();  // Extract the reward's document ID
+            // Create a new user with Firebase Authentication
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    // Hide progress bar when registration is complete
+                    progressBar.setVisibility(View.GONE);
 
-                // Create the user_reward map
-                Map<String, Object> userReward = new HashMap<>();
-                userReward.put("userID", userId);
-                userReward.put("rewardID", rewardId);
-                userReward.put("progress", 0);  // Initial progress
-                userReward.put("completed", false);  // Initially set to incomplete
-                userReward.put("tracked", false);  // Initially not tracked
+                    if (task.isSuccessful()) {
+                        // Get the current user ID
+                        userID = mAuth.getCurrentUser().getUid();
 
-                // Now set the collection to user_rewards
-                fbm.setCollection("user_rewards");
+                        // Create a Firestore document for the new user
+                        DocumentReference documentReference = fstore.collection("users").document(userID);
 
-                // Create a new document for each user_reward
-                fbm.createNewDocument(userReward, success -> {
-                    if (success) {
-                        Log.d("Firestore", "User reward document created successfully for rewardID: " + rewardId);
+                        // Prepare user data to save in Firestore
+                        Map<String, Object> user = new HashMap<>();
+                        user.put("fName", fName);
+                        user.put("lName", lName);
+                        user.put("email", email);
+                        user.put("age", age);
+                        user.put("activityCategory", activityCategory);
+                        user.put("pointOfInterest", pointOfInterest);
+
+                        // Save user data in Firestore
+                        documentReference.set(user).addOnSuccessListener(aVoid -> {
+                            Toast.makeText(Register.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                            // Initialize user rewards after registration
+                            createUserRewards(userID);
+                        }).addOnFailureListener(e ->
+                                Toast.makeText(Register.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                        );
+
+                        // Navigate to the Login activity
+                        Intent intent = new Intent(getApplicationContext(), Login.class);
+                        startActivity(intent);
+                        finish();
                     } else {
-                        Log.e("Firestore", "Failed to create user reward document for rewardID: " + rewardId);
+                        // Handle registration errors
+                        try {
+                            throw task.getException();
+                        } catch (FirebaseAuthUserCollisionException e) {
+                            Toast.makeText(Register.this, "Email already registered.", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(Register.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    return null;
-                });
-            }
-            return null;  // Necessary because we're calling Kotlin code
+                }
+            });
         });
     }
 
+    // This initializes the POI map with friendly names and Google Places API terms
+    private void initializePoiMap() {
+        poiMap.put("Bakery", "bakery");
+        poiMap.put("Bar", "bar");
+        poiMap.put("Book Store", "book_store");
+        poiMap.put("Cafe", "cafe");
+        poiMap.put("Gym", "gym");
+        poiMap.put("Library", "library");
+        poiMap.put("Movie Theater", "movie_theater");
+        poiMap.put("Park", "park");
+        poiMap.put("Pet Store", "pet_store");
+        poiMap.put("Restaurant", "restaurant");
+        poiMap.put("Shopping Mall", "shopping_mall");
+        poiMap.put("Spa", "spa");
+        poiMap.put("Stadium", "stadium");
+        poiMap.put("Tourist Attraction", "tourist_attraction");
+        poiMap.put("University", "university");
+        poiMap.put("Zoo", "zoo");
+    }
 
+    // This initializes user rewards for the new user in Firestore
+    public void createUserRewards(final String userId) {
+        // Fetch all reward documents from the "rewards" collection
+        fstore.collection("rewards").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Iterate through each reward document
+                for (QueryDocumentSnapshot rewardDoc : task.getResult()) {
+                    String rewardId = rewardDoc.getId();
 
+                    // Prepare user reward data
+                    Map<String, Object> userReward = new HashMap<>();
+                    userReward.put("userID", userId);
+                    userReward.put("rewardID", rewardId);
+                    userReward.put("progress", 0); // Set initial progress to 0
+                    userReward.put("completed", false); // Mark as incomplete
+                    userReward.put("tracked", false); // Mark as not tracked
+
+                    // Save user reward data in the "user_rewards" collection
+                    fstore.collection("user_rewards")
+                            .add(userReward)
+                            .addOnSuccessListener(docRef -> Log.d("Firestore", "User reward created for rewardID: " + rewardId))
+                            .addOnFailureListener(e -> Log.e("Firestore", "Error creating user reward: " + e.getMessage()));
+                }
+            } else {
+                // Log an error if fetching rewards fails
+                Log.e("Firestore", "Error fetching rewards: " + task.getException().getMessage());
+            }
+        });
+    }
 }
