@@ -41,7 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp" />
 
-    <!-- Hint Text for Spinner Age -->
     <TextView
         android:text="Select your age:"
         android:layout_width="match_parent"
@@ -56,7 +55,6 @@
         android:layout_marginTop="5dp"
         android:spinnerMode="dropdown" />
 
-    <!-- Hint Text for Spinner Activity Category -->
     <TextView
         android:text="Choose an activity category:"
         android:layout_width="match_parent"
@@ -71,7 +69,6 @@
         android:layout_marginTop="5dp"
         android:spinnerMode="dropdown" />
 
-    <!-- Hint Text for Spinner Point of Interest -->
     <TextView
         android:text="Select a point of interest:"
         android:layout_width="match_parent"
@@ -86,13 +83,18 @@
         android:layout_marginTop="5dp"
         android:spinnerMode="dropdown" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/password"
-        android:hint="@string/password"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:inputType="textPassword"/>
+        app:endIconMode="password_toggle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password"
+            android:hint="@string/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
