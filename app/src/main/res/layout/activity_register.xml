@@ -1,92 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:gravity="center"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
     tools:context=".Register">
 
+    <!-- Register Title -->
     <TextView
+        android:id="@+id/register_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/register"
-        android:textSize="20sp"
+        android:textSize="28sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="20dp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="24dp" />
+
+    <!-- First Name Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/navy_blue" />
+        android:layout_marginBottom="10dp">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/f_name"
-        android:hint="First Name"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/f_name"
+            android:hint="First Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Last Name Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        android:layout_marginBottom="10dp">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/l_name"
-        android:hint="Last Name"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/l_name"
+            android:hint="Last Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Email Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        android:layout_marginBottom="10dp">
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/email"
-        android:hint="@string/email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/email"
+            android:hint="@string/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Age Spinner -->
     <TextView
-        android:text="Select your age:"
+        android:id="@+id/age_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/black" />
+        android:text="Select your age:"
+        android:textColor="@color/black"
+        android:layout_marginBottom="5dp" />
 
     <Spinner
         android:id="@+id/spinner_age"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="16dp"
         android:spinnerMode="dropdown" />
 
+    <!-- Activity Category Spinner -->
     <TextView
-        android:text="Choose an activity category:"
+        android:id="@+id/activity_category_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/black" />
+        android:text="Choose an activity category:"
+        android:textColor="@color/black"
+        android:layout_marginBottom="5dp" />
 
     <Spinner
         android:id="@+id/spinner_activity_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="16dp"
         android:spinnerMode="dropdown" />
 
+    <!-- Point of Interest Spinner -->
     <TextView
-        android:text="Select a point of interest:"
+        android:id="@+id/poi_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/black" />
+        android:text="Select a point of interest:"
+        android:textColor="@color/black"
+        android:layout_marginBottom="5dp" />
 
     <Spinner
         android:id="@+id/spinner_point_of_interest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="16dp"
         android:spinnerMode="dropdown" />
 
+    <!-- Password Input -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:endIconMode="password_toggle">
+        app:endIconMode="password_toggle"
+        android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
@@ -96,26 +126,33 @@
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/progressBar"
-        android:visibility="gone"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
 
+    <!-- Register Button -->
     <Button
         android:id="@+id/button_register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/register"
-        android:backgroundTint="@color/bright_orange" />
-
-    <TextView
-        android:id="@+id/loginNow"
-        android:layout_marginTop="20dp"
-        android:text="@string/click_to_login"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18dp"
-        android:textStyle="bold" />
+        android:text="@string/register"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/black"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp" />
+
+    <!-- Login Now Text -->
+    <TextView
+        android:id="@+id/loginNow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/click_to_login"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/black" />
 </LinearLayout>

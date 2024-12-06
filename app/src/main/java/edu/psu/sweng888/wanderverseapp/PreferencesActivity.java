@@ -1,110 +1,134 @@
 package edu.psu.sweng888.wanderverseapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PreferencesActivity extends AppCompatActivity {
 
-    private ArrayList<CheckBox> interestCheckboxes;
-    private ArrayList<CheckBox> distanceCheckboxes;
-    private static final int MAX_INTEREST_SELECTIONS = 3;
+    private Spinner spinnerUpdatePoi;
+    private Button btnSavePoi;
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore fstore;
+
+    // Has map to associate friendly names with Google Places API terms
+    private final Map<String, String> poiMap = new HashMap<>();
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
 
-        // Points of Interest Checkboxes
-        interestCheckboxes = new ArrayList<>();
-        interestCheckboxes.add(findViewById(R.id.checkbox_parks));
-        interestCheckboxes.add(findViewById(R.id.checkbox_coffee_shops));
-        interestCheckboxes.add(findViewById(R.id.checkbox_museums));
-        interestCheckboxes.add(findViewById(R.id.checkbox_bars));
-        interestCheckboxes.add(findViewById(R.id.checkbox_restaurants));
-        interestCheckboxes.add(findViewById(R.id.checkbox_theaters));
-        interestCheckboxes.add(findViewById(R.id.checkbox_malls));
-        interestCheckboxes.add(findViewById(R.id.checkbox_uni));
-        interestCheckboxes.add(findViewById(R.id.checkbox_libraries));
-        interestCheckboxes.add(findViewById(R.id.checkbox_historical_sites));
+        // Initializes Firebase instances
+        mAuth = FirebaseAuth.getInstance();
+        fstore = FirebaseFirestore.getInstance();
+        userID = mAuth.getCurrentUser().getUid();
 
-        // Distance Checkboxes
-        distanceCheckboxes = new ArrayList<>();
-        distanceCheckboxes.add(findViewById(R.id.checkbox_distance_short));
-        distanceCheckboxes.add(findViewById(R.id.checkbox_distance_medium));
-        distanceCheckboxes.add(findViewById(R.id.checkbox_distance_long));
+        spinnerUpdatePoi = findViewById(R.id.spinner_update_poi);
+        btnSavePoi = findViewById(R.id.btn_save_poi);
 
-        // Set listener to limit selections for Points of Interest
-        for (CheckBox checkBox : interestCheckboxes) {
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked && getSelectedInterestCount() > MAX_INTEREST_SELECTIONS) {
-                    buttonView.setChecked(false);
-                    Toast.makeText(this, "You can select up to " + MAX_INTEREST_SELECTIONS + " points of interest.", Toast.LENGTH_SHORT).show();
+        // Initializes the POI map with friendly names and API terms
+        initializePoiMap();
+
+        // Populates the spinner
+        ArrayAdapter<String> poiAdapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, poiMap.keySet().toArray(new String[0]));
+        poiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerUpdatePoi.setAdapter(poiAdapter);
+
+        loadCurrentPoiPreference();
+
+        btnSavePoi.setOnClickListener(view -> savePoiPreference());
+    }
+
+    // Loads the current POI preference from Firestore
+    private void loadCurrentPoiPreference() {
+        DocumentReference userDocRef = fstore.collection("users").document(userID);
+        userDocRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String currentPoi = documentSnapshot.getString("pointOfInterest");
+
+                // Finds the friendly name for the current POI
+                String friendlyPoi = getFriendlyPoiName(currentPoi);
+
+                // Sets the spinner selection to the current POI
+                if (friendlyPoi != null) {
+                    ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerUpdatePoi.getAdapter();
+                    int position = adapter.getPosition(friendlyPoi);
+                    spinnerUpdatePoi.setSelection(position);
                 }
-            });
-        }
-
-        // Set listener for Distance Preferences (only one selection allowed)
-        for (CheckBox checkBox : distanceCheckboxes) {
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    for (CheckBox otherCheckbox : distanceCheckboxes) {
-                        if (otherCheckbox != buttonView) {
-                            otherCheckbox.setChecked(false);
-                        }
-                    }
-                }
-            });
-        }
-
-        Button saveButton = findViewById(R.id.button_save_preferences);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                savePreferences();
-                startActivity(new Intent(PreferencesActivity.this, MapActivity.class));
-                finish();
+            } else {
+                Toast.makeText(PreferencesActivity.this, "Failed to load current preference", Toast.LENGTH_SHORT).show();
             }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(PreferencesActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
 
-    private int getSelectedInterestCount() {
-        int count = 0;
-        for (CheckBox checkBox : interestCheckboxes) {
-            if (checkBox.isChecked()) count++;
+    // Saves the updated POI preference to Firestore
+    private void savePoiPreference() {
+        String selectedFriendlyPoi = spinnerUpdatePoi.getSelectedItem().toString();
+        String selectedPoi = poiMap.get(selectedFriendlyPoi);
+
+        if (selectedPoi != null) {
+            DocumentReference userDocRef = fstore.collection("users").document(userID);
+
+
+            userDocRef.update("pointOfInterest", selectedPoi)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(PreferencesActivity.this, "Preference updated successfully", Toast.LENGTH_SHORT).show();
+                        finish(); // Close the activity
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(PreferencesActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(this, "Invalid selection", Toast.LENGTH_SHORT).show();
         }
-        return count;
     }
 
-    private void savePreferences() {
-        Set<String> selectedInterests = new HashSet<>();
-        for (CheckBox checkBox : interestCheckboxes) {
-            if (checkBox.isChecked()) {
-                selectedInterests.add(checkBox.getText().toString());
+    // friendly names and place api mapping
+    private void initializePoiMap() {
+        poiMap.put("Bakery", "bakery");
+        poiMap.put("Bar", "bar");
+        poiMap.put("Book Store", "book_store");
+        poiMap.put("Cafe", "cafe");
+        poiMap.put("Gym", "gym");
+        poiMap.put("Library", "library");
+        poiMap.put("Movie Theater", "movie_theater");
+        poiMap.put("Park", "park");
+        poiMap.put("Pet Store", "pet_store");
+        poiMap.put("Restaurant", "restaurant");
+        poiMap.put("Shopping Mall", "shopping_mall");
+        poiMap.put("Spa", "spa");
+        poiMap.put("Stadium", "stadium");
+        poiMap.put("Tourist Attraction", "tourist_attraction");
+        poiMap.put("University", "university");
+        poiMap.put("Zoo", "zoo");
+    }
+
+    // Gets the friendly name for the given API term
+    private String getFriendlyPoiName(String apiPoi) {
+        for (Map.Entry<String, String> entry : poiMap.entrySet()) {
+            if (entry.getValue().equals(apiPoi)) {
+                return entry.getKey();
             }
         }
-
-        String selectedDistance = "";
-        for (CheckBox checkBox : distanceCheckboxes) {
-            if (checkBox.isChecked()) {
-                selectedDistance = checkBox.getText().toString();
-                break;
-            }
-        }
-
-        // Save the preferences to shared preferences or another storage method
-        getSharedPreferences("Preferences", MODE_PRIVATE).edit()
-                .putStringSet("selectedInterests", selectedInterests)
-                .putString("selectedDistance", selectedDistance)
-                .apply();
-
-        Toast.makeText(this, "Preferences saved!", Toast.LENGTH_SHORT).show();
+        return null;
     }
 }
