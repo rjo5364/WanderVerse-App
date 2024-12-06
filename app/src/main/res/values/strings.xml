@@ -1,4 +1,7 @@
 <resources>
+    <string name="open">Open Navigation Drawer</string>
+    <string name="close">Close Navigation Drawer</string>
+
     <string name="app_name">WanderverseApp</string>
     <string name="HelloWorld">Hello World!</string>
     <string name="login">Login</string>
