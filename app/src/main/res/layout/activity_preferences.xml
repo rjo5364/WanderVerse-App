@@ -1,34 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_update_poi_title"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/tv_update_poi_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:text="Update Point of Interest"
+            android:textColor="@color/black"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_update_poi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_save_poi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Preference"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update Point of Interest"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginTop="-250dp"
-        android:layout_marginBottom="50dp"
-        android:textColor="@color/black" />
-
-    <Spinner
-        android:id="@+id/spinner_update_poi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/btn_save_poi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save Preference"
-        android:backgroundTint="@color/black"
-        android:textColor="@color/white" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation_menu"
+        android:background="@color/white" />
+</androidx.drawerlayout.widget.DrawerLayout>

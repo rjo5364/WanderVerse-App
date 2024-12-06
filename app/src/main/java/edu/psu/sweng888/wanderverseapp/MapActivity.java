@@ -1,10 +1,12 @@
 package edu.psu.sweng888.wanderverseapp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,8 +14,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -56,6 +61,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth; // Handles Firebase Authentication
     private FirebaseFirestore db; // Handles Firestore database operations
 
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ActionBarDrawerToggle toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +79,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setupUI();
         fetchUserPreference();
         checkLocationPermission();
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+
+
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
     }
+
+
 
     private void setupUI() {
         // Sets the title for the activity
@@ -275,5 +298,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (locationPermissionGranted) {
             mMap.setMyLocationEnabled(true);
         }
+    }
+
+    private boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_main) {
+            // Navigate to MainActivity
+            startActivity(new Intent(this, MainActivity.class));
+            finish(); // Optional: Finish current activity to prevent stacking
+        } else if (id == R.id.nav_map) {
+            Toast.makeText(this, "Already on Map", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_rewards) {
+            startActivity(new Intent(this, RewardsList.class));
+        } else if (id == R.id.nav_preferences) {
+            startActivity(new Intent(this, PreferencesActivity.class));
+        } else if (id == R.id.nav_logout) {
+            mAuth.signOut();
+            Intent intent = new Intent(this, Login.class);
+            startActivity(intent);
+            finish();
+        }
+
+        drawerLayout.closeDrawers(); // Close the drawer
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return toggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 }

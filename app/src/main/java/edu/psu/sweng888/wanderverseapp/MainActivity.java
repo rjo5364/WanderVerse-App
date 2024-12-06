@@ -1,13 +1,17 @@
 package edu.psu.sweng888.wanderverseapp;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -15,94 +19,111 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
-    FirebaseAuth auth; // Handles Firebase Authentication
-    FirebaseFirestore db; // Handles Firestore database operations
-    Button buttonLogout, buttonViewRewards, buttonPreferences, buttonMap; // Buttons for user actions
-    TextView textViewWelcome; // Displays welcome message
-    FirebaseUser user; // Represents the logged-in user
+    FirebaseAuth auth;
+    FirebaseFirestore db;
+    TextView textViewWelcome;
+    FirebaseUser user;
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    ActionBarDrawerToggle toggle;
+
+    // Buttons for user actions
+    Button buttonMap, buttonViewRewards, buttonPreferences, buttonLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Firebase instances
+        // Initializes Firebase and UI components
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        // Find views by ID
-        buttonLogout = findViewById(R.id.buttonLogout);
         textViewWelcome = findViewById(R.id.user_information);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+
+        buttonMap = findViewById(R.id.view_map);
         buttonViewRewards = findViewById(R.id.button_view_rewards);
         buttonPreferences = findViewById(R.id.button_preferences);
-        buttonMap = findViewById(R.id.view_map);
+        buttonLogout = findViewById(R.id.buttonLogout);
 
-        // Get the currently logged-in user
+        // Configures the ActionBarDrawerToggle for the navigation drawer
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Enables the ActionBar to display the navigation drawer toggle
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Sets up navigation menu item click handling
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+
+        // Checks if the user is logged in, otherwise navigates to Login
         user = auth.getCurrentUser();
-
         if (user == null) {
-            // If no user is logged in, redirect to the Login activity
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
-            finish();
+            navigateToLogin();
         } else {
-            // Fetch user's first and last name from Firestore
             fetchUserDetails();
         }
 
-        // Logout button click
+        // Configures button click listeners
+        buttonMap.setOnClickListener(view -> startActivity(new Intent(this, MapActivity.class)));
+        buttonViewRewards.setOnClickListener(view -> startActivity(new Intent(this, RewardsList.class)));
+        buttonPreferences.setOnClickListener(view -> startActivity(new Intent(this, PreferencesActivity.class)));
         buttonLogout.setOnClickListener(view -> {
-            // Sign out the user and navigate to Login activity
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
-            finish();
-        });
-
-        // View rewards button click
-        buttonViewRewards.setOnClickListener(view -> {
-            // Navigate to the RewardsList activity
-            Intent intent = new Intent(MainActivity.this, RewardsList.class);
-            startActivity(intent);
-        });
-
-        // Preferences button click
-        buttonPreferences.setOnClickListener(view -> {
-            // Navigate to the PreferencesActivity
-            Intent intent = new Intent(MainActivity.this, PreferencesActivity.class);
-            startActivity(intent);
-        });
-
-        // Map button click
-        buttonMap.setOnClickListener(view -> {
-            // Navigate to the MapActivity
-            Intent intent = new Intent(MainActivity.this, MapActivity.class);
-            startActivity(intent);
+            auth.signOut();
+            navigateToLogin();
         });
     }
 
-    private void fetchUserDetails() {
-        // Get the user ID from the logged-in user
-        String userId = user.getUid();
+    private boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handles navigation menu item selections
+        int id = item.getItemId();
 
-        // Fetch the user's document from the "users" collection in Firestore
+        if (id == R.id.nav_map) {
+            startActivity(new Intent(this, MapActivity.class));
+        } else if (id == R.id.nav_rewards) {
+            startActivity(new Intent(this, RewardsList.class));
+        } else if (id == R.id.nav_preferences) {
+            startActivity(new Intent(this, PreferencesActivity.class));
+        } else if (id == R.id.nav_logout) {
+            auth.signOut();
+            navigateToLogin();
+        }
+
+        drawerLayout.closeDrawers(); // Closes the navigation drawer
+        return true;
+    }
+
+    private void fetchUserDetails() {
+        // Fetches user details from Firestore
+        String userId = user.getUid();
         db.collection("users").document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                // Retrieve the first and last name from Firestore
                 DocumentSnapshot document = task.getResult();
                 String fName = document.getString("fName");
                 String lName = document.getString("lName");
 
-                // Set the welcome message
-                if (fName != null && lName != null) {
-                    textViewWelcome.setText(String.format("Welcome %s %s!", fName, lName));
-                } else {
-                    textViewWelcome.setText("Welcome User!");
-                }
+                // Updates the welcome message
+                textViewWelcome.setText(fName != null && lName != null
+                        ? String.format("Welcome %s %s!", fName, lName)
+                        : "Welcome User!");
             } else {
-                // If the fetch fails, show a default message
+                // Displays a default welcome message if fetching fails
                 textViewWelcome.setText("Welcome User!");
             }
         });
+    }
+
+    private void navigateToLogin() {
+        // Navigates to the Login activity
+        startActivity(new Intent(getApplicationContext(), Login.class));
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handles the navigation drawer toggle
+        return toggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 }
