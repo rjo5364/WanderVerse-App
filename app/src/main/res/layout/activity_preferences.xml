@@ -1,107 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PreferencesActivity">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@color/white">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tv_update_poi_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Point of Interest"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginTop="-250dp"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/black" />
+
+    <Spinner
+        android:id="@+id/spinner_update_poi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select up to 3 Points of Interest"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingBottom="8dp" />
-
-        <!-- Points of Interest Checkboxes -->
-        <CheckBox android:id="@+id/checkbox_parks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Parks"
-            />
-        <CheckBox android:id="@+id/checkbox_coffee_shops"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Coffee Shops"
-            />
-        <CheckBox android:id="@+id/checkbox_museums"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Museums"
-            />
-        <CheckBox android:id="@+id/checkbox_bars"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bars"
-            />
-        <CheckBox android:id="@+id/checkbox_restaurants"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Restaurants"
-            />
-        <CheckBox android:id="@+id/checkbox_theaters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Theaters"
-            />
-        <CheckBox android:id="@+id/checkbox_malls"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Malls"
-            />
-        <CheckBox android:id="@+id/checkbox_uni"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="University"
-            />
-        <CheckBox android:id="@+id/checkbox_libraries"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Libraries"
-            />
-        <CheckBox android:id="@+id/checkbox_historical_sites"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Historical Sites"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select a Distance Preference"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingTop="16dp"
-            android:paddingBottom="8dp" />
-
-        <!-- Distance Preference Checkboxes -->
-        <CheckBox android:id="@+id/checkbox_distance_short"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.5-2 miles"
-            />
-        <CheckBox android:id="@+id/checkbox_distance_medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3-6 miles"
-            />
-        <CheckBox android:id="@+id/checkbox_distance_long"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10-15 miles" />
-
-        <Button
-            android:id="@+id/button_save_preferences"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Preferences"
-            android:layout_marginTop="16dp" />
-    </LinearLayout>
-</ScrollView>
+    <Button
+        android:id="@+id/btn_save_poi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Preference"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white" />
+</LinearLayout>
